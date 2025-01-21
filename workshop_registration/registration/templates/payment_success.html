@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Successful</title>
+        {% load static %}
+    <link rel="stylesheet" href="{% static 'registration/css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="payment-success-container">
+            <h1>Payment Successful!</h1>
+            <p>Thank you for your registration.</p>
+            <p>Your payment has been processed successfully.</p>
+            <p>You will receive a confirmation email shortly.</p>
+
+            <a href="{% url 'registration' %}" class="back-to-registration">Register for another event</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Failed</title>
+        {% load static %}
+    <link rel="stylesheet" href="{% static 'registration/css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="payment-failure-container">
+            <h1>Payment Failed</h1>
+            <p>We're sorry, but your payment could not be processed.</p>
+            <p>Please check your payment details and try again.</p>
+            <p>Possible reasons for failure:</p>
+            <ul>
+                <li>Incorrect card details</li>
+                <li>Insufficient funds</li>
+                <li>Network issues</li>
+                <li>Payment gateway issues</li>
+            </ul>
+            <a href="{% url 'registration' %}" class="try-again-button">Try Again</a>
+
+        </div>
+    </div>
+</body>
+</html>

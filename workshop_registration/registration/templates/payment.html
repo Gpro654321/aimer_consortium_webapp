@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment</title>
+</head>
+<body>
+    <form id="payment-form" action="{% url 'payment_success' %}" method="POST">
+        {% csrf_token %}
+        <script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            data-key="{{ key_id }}"
+            data-amount="{{ order.amount }}"
+            data-currency="{{ order.currency }}"
+            data-order_id="{{ order.id }}"
+            data-buttontext="Pay with Razorpay"
+            data-name="AIMER Workshop"
+            data-description="Payment for Workshop Registration"
+            data-prefill.name="{{ participant.name }}"
+            data-prefill.email="{{ participant.email }}"
+            data-prefill.contact="{{ participant.mobile_number }}"
+            data-theme.color="#F37254"
+            data-notes.participant_id="{{ participant.id }}"
+        ></script>
+        <input type="hidden" name="razorpay_order_id" value="{{ order.id }}">
+    </form>
+
+    <script>
+        // Optional frontend callback for success
+        var options = {
+            "key": "{{ key_id }}",
+            "amount": "{{ order.amount }}",
+            "currency": "{{ order.currency }}",
+            "order_id": "{{ order.id }}",
+            "name": "AIMER Workshop",
+            "description": "Payment for Workshop Registration",
+            "prefill": {
+                "name": "{{ participant.name }}",
+                "email": "{{ participant.email }}",
+                "contact": "{{ participant.mobile_number}}"
+            },
+            "notes": {
+                "participant_id": "{{ participant.id }}"
+            },
+            "theme": {
+                "color": "#F37254"
+            },
+            "handler": function (response) {
+                console.log("Payment Success:", response);
+                document.getElementById('payment-form').submit();
+            }
+        };
+    </script>
+</body>
+</html>

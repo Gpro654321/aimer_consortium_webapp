@@ -1,0 +1,4 @@
+Django>=5.1.4
+django-crispy-forms
+razorpay
+psycopg2-binary
