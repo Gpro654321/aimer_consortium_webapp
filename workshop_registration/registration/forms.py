@@ -22,7 +22,9 @@ class RegistrationForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
+        print("Inside registration app - forms.py - cleaned_data\n",cleaned_data)
         registration_type = cleaned_data.get("registration_type")
+        print("Inside registration app forms.py - registration_type\n", registration_type)
         # Check if participant with the same email already exists (for AIMER registration)
         if registration_type.name == "AIMER" and \
                                     Participant.objects.filter(email=cleaned_data["email"]).exists():

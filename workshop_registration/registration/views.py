@@ -7,6 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import WorkshopPricing
 from datetime import date
+import datetime
+from django.utils import timezone
 
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
@@ -197,17 +199,18 @@ def registration_view(request):
 
             order = create_razorpay_order(participant, amount)
 
-            # Create ParticipantRegistration
+            # Create ParticipantRegistration without the payment
             participant_registration = ParticipantRegistration.objects.create(
                 participant=participant,
                 registration_type=registration_type,
                 razorpay_order_id=order['id'],
-                amount_paid=amount
+                #amount_paid=amount
             )
 
             # Create AimerMember if registering for AIMER
-            if is_aimer_registration:
-                AimerMember.objects.get_or_create(participant=participant)
+
+            #if is_aimer_registration:
+            #   AimerMember.objects.get_or_create(participant=participant)
 
             context = {
                 'order': order,
@@ -259,13 +262,14 @@ def payment_success(request):
         order_id = request.POST.get('razorpay_order_id', None)
         signature = request.POST.get('razorpay_signature', None)
 
-        print(request.POST)
+        print("Inside registration app, payment_success view fun - request.POST\n",request.POST)
+        print("Inside registration app, payment_success view fun - order_id\n", order_id)
 
         razorpay_order = client.order.fetch(order_id)
 
         participant_id = int(razorpay_order['receipt'].split("_")[-1])
-        print("razorpay_order")
-        print(razorpay_order)
+        print("Inside registration app - views - payment_success -razorpay_order\n",razorpay_order)
+        
         print(participant_id)
 
         try:
@@ -286,9 +290,15 @@ def payment_success(request):
             participant.save()
             
             # update the payment id
-            
-
             # update the registration time and date
+            participant_registration = ParticipantRegistration.objects.filter(participant=participant).last()
+            if participant_registration:
+                participant_registration.amount_paid = float(razorpay_order['amount_paid']) / 100
+                participant_registration.razorpay_payment_id = payment_id
+                participant_registration.payment_status = True
+                participant_registration.registered_at = timezone.now()  # Update to current time
+                print("Inside registration app-payment success fn-register at\n",timezone.now())
+                participant_registration.save()
 
             # Create AimerMember only if registering for AIMER and payment successful
             registration_type = ParticipantRegistration.objects.filter(participant=participant).last().registration_type
