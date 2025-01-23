@@ -1,5 +1,6 @@
 from django import forms
 from .models import Participant, RegistrationType
+from datetime import date
 
 """
 class RegistrationForm(forms.ModelForm):
@@ -15,7 +16,13 @@ class RegistrationForm(forms.ModelForm):
 """
 
 class RegistrationForm(forms.Form):
-    registration_type = forms.ModelChoiceField(queryset=RegistrationType.objects.all())
+    today = date.today() 
+    registration_type = forms.ModelChoiceField(
+                            queryset = RegistrationType.objects.filter(
+                                            workshoppricing__is_alive=True,  # Filter by related WorkshopPricing model
+                                            workshoppricing__workshop_end_date__gte=today  # Filter by workshop end date
+                                        ).distinct()  # Remove duplicates (optional)
+                            )
     name = forms.CharField(max_length=255)
     email = forms.EmailField()
     mobile_number = forms.CharField(max_length=20)

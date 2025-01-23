@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment</title>
+    <style>
+        #redirect-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="redirect-message">
+        <div class="loader"></div>
+        <p>Redirecting to Razorpay for secure payment...</p>
+        <p id="error-message" style="color: red; display: none;"></p>
+    </div>
+    <form id="payment-form" action="{% url 'payment_success' %}" method="POST" style="display: none;">
+        {% csrf_token %}
+        <input type="hidden" name="razorpay_order_id" value="{{ order.id }}">
+    </form>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        var options = {
+            "key": "{{ key_id }}",
+            "amount": "{{ order.amount }}",
+            "currency": "{{ order.currency }}",
+            "order_id": "{{ order.id }}",
+            "name": "AIMER Consortium",
+            "description": "Payment for Workshop Registration",
+            "prefill": {
+                "name": "{{ prefill.name }}",
+                "email": "{{ prefill.email }}",
+                "contact": "{{ prefill.contact }}"
+            },
+            "notes": {
+                "participant_id": "{{ participant.id }}"
+            },
+            "theme": {
+                "color": "#F37254"
+            },
+            "handler": function (response) {
+                console.log("Payment Success:", response);
+                if (response && response.razorpay_payment_id) {
+                    var form = document.getElementById('payment-form'); // Get the form
+
+                    // Create hidden input fields
+                    var paymentIdInput = document.createElement('input');
+                    paymentIdInput.type = 'hidden';
+                    paymentIdInput.name = 'razorpay_payment_id';
+                    paymentIdInput.value = response.razorpay_payment_id;
+                    form.appendChild(paymentIdInput);
+
+                    var orderIdInput = document.createElement('input');
+                    orderIdInput.type = 'hidden';
+                    orderIdInput.name = 'razorpay_order_id';
+                    orderIdInput.value = response.razorpay_order_id;
+                    form.appendChild(orderIdInput);
+
+                    var signatureInput = document.createElement('input');
+                    signatureInput.type = 'hidden';
+                    signatureInput.name = 'razorpay_signature';
+                    signatureInput.value = response.razorpay_signature;
+                    form.appendChild(signatureInput);
+
+                    form.submit(); // Submit the form
+                } else {
+                    console.error("Payment failed or response is invalid:", response);
+                    document.getElementById('redirect-message').style.display = 'none';
+                    document.getElementById('error-message').innerText = "Payment Failed, Please try again.";
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            },
+            "modal": {
+                "ondismiss": function() {
+                    document.getElementById('redirect-message').style.display = 'none';
+                    document.getElementById('error-message').innerText = "Payment cancelled.";
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        window.onload = function() {
+            rzp1.open();
+            document.getElementById('redirect-message').style.display = 'flex';
+        };
+    </script>
+</body>
+</html>

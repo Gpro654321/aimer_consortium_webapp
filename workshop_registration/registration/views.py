@@ -217,7 +217,7 @@ def registration_view(request):
                 'participant': participant,
                 'key_id': settings.RAZORPAY_KEY_ID
             }
-            return render(request, './payment.html', context)
+            return render(request, './payment_automatic_redirect2.html', context)
         else:
             return render(request, './registration.html', {'form': form})
     else:

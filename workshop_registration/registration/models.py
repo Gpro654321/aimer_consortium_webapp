@@ -43,7 +43,7 @@ class Participant(models.Model):
 
 class Participant(models.Model):
     name = models.CharField(max_length=255)
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     mobile_number = models.CharField(max_length=20)
 
     def __str__(self):
@@ -67,8 +67,26 @@ class WorkshopPricing(models.Model):
     workshop_name = models.ForeignKey(RegistrationType, on_delete=models.CASCADE)
     early_bird_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     regular_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    aimer_member_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Price for AIMER members (leave blank if not applicable)")
+    aimer_member_price = models.DecimalField(
+                                        max_digits=10, decimal_places=2, null=True, 
+                                        blank=True, 
+                                        help_text="Price for AIMER members (leave blank if not applicable)"
+                                        )
+    # cut_off_date is the date on which early bird registrations stop and normal prices resume
     cut_off_date = models.DateField(null=True, blank=True)
+    workshop_start_date = models.DateField(
+                                        null=True,
+                                        blank=False,
+                                        help_text="Date on which workshop starts"
+                                           )
+    workshop_end_date = models.DateField(
+                                        null=True,
+                                        blank=False,
+                                        help_text="Date on which workshop ends"
+                                        )
+    is_alive = models.BooleanField(
+                                    default=False
+                                        )
 
     def __str__(self):
         return f"{self.workshop_name.name} Pricing"
