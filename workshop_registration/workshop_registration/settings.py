@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-import os
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -29,7 +28,7 @@ SECRET_KEY = 'django-insecure-bna@b(vdh^%2=p3%h$%$=yhyd3x#x^i433)o&-h@^h(6!+m_kk
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -80,27 +79,27 @@ WSGI_APPLICATION = 'workshop_registration.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # default database
+'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-
 '''
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'aimer',  # Replace with your actual database name
-        'USER': 'genaigpt',  # Replace with your database username
-        'PASSWORD': 'genaigpt',  # Replace with your database password
-        'HOST': 'localhost',  # Change to your database host if it's on a different server
+        'NAME': 'test_db',  # Replace with your actual database name
+        'USER': 'test',  # Replace with your database username
+        'PASSWORD': 'test',  # Replace with your database password
+        'HOST': 'db',  # Change to your database host if it's on a different server
         'PORT': '5432',  # Default PostgreSQL port
     }
 }
 
-'''
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -140,6 +139,9 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',  # If you have project-level static files
 ]
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 # Default primary key field type

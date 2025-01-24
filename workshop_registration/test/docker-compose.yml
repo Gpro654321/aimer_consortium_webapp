@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+  web:
+    build:
+      context: /home/gg/Dev/AIMER/workshop_registration/test/  # Replace with the actual absolute path
+      dockerfile: Dockerfile # If the Dockerfile is not in the context directory, then specify its path relative to the context directory
+    ports:
+      - "5000:5000"

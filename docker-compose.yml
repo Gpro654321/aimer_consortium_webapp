@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+  web:
+    build: .
+    volumes:
+      - .:/code
+      - static_volume:/code/static
+      - media_volume:/code/media
+    expose:
+      - "8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - POSTGRES_NAME=test_db
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - SECRET_KEY=your_django_secret_key # Replace with a strong, random key
+      - DEBUG=1 # Keep DEBUG=1 for local development
+      - ALLOWED_HOSTS=* # Allow all hosts for local testing
+      - USE_TZ=True
+      - TIME_ZONE=Asia/Kolkata # Set your timezone
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web.rule=Host(`localhost`)" # Use localhost
+      - "traefik.http.routers.web.entrypoints=web"
+      - "traefik.http.services.web.loadbalancer.server.port=8000"
+
+  traefik:
+    image: traefik:v2.10
+    ports:
+      - "80:80" # Map host port 80 to container port 80
+      - "8080:8080" # Expose Traefik dashboard port
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.yml:/etc/traefik/traefik.yml
+      - ./acme.json:/acme.json # Keep this for consistent config, but it won't be used locally
+    command:
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --api.insecure=true # Enable insecure API for local dashboard access
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=test_db
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d test_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
