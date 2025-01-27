@@ -16,5 +16,8 @@ COPY . /code/
 # Collect static files (important for production)
 RUN python ./workshop_registration/manage.py collectstatic --noinput
 
+
+WORKDIR /code/workshop_registration/
+
 # Set the entrypoint to Gunicorn
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--threads", "2", "workshop_registration.wsgi:application"]

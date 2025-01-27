@@ -4,61 +4,44 @@ services:
   web:
     build: .
     volumes:
-      - static_volume:/code/staticfiles # Mount the static files where Django collects them
+      - static_volume:/static
       - .:/code
+      - static_volume:/code/static
       - media_volume:/code/media
     expose:
       - "8000"
     depends_on:
       db:
         condition: service_healthy
-    env_file:
-      - .env  # Explicitly load the .env file
     environment:
       - POSTGRES_NAME=test_db
       - POSTGRES_USER=test
       - POSTGRES_PASSWORD=test
-      - SECRET_KEY=${SECRET_KEY} # Use the environment variable
-      - DEBUG=1
-      - ALLOWED_HOSTS=*
+      - SECRET_KEY=your_django_secret_key # Replace with a strong, random key
+      - DEBUG=1 # Keep DEBUG=1 for local development
+      - ALLOWED_HOSTS=* # Allow all hosts for local testing
       - USE_TZ=True
-      - TIME_ZONE=Asia/Kolkata
+      - TIME_ZONE=Asia/Kolkata # Set your timezone
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.web.rule=Host(`localhost`)"
+      - "traefik.http.routers.web.rule=Host(`localhost`)" # Use localhost
       - "traefik.http.routers.web.entrypoints=web"
       - "traefik.http.services.web.loadbalancer.server.port=8000"
-
-  nginx:
-    image: nginx:latest
-    volumes:
-      - static_volume:/var/www/static # Mount to where Nginx serves from
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - web
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.static.rule=Host(`localhost`) && PathPrefix(`/static`)"
-      - "traefik.http.routers.static.entrypoints=web"
-      - "traefik.http.services.static.loadbalancer.server.port=80"
-    ports:
-       - "8081:80" #Expose nginx on different port for testing, traefik will handle 80
 
   traefik:
     image: traefik:v2.10
     ports:
-      - "80:80"
-      - "8080:8080"
+      - "80:80" # Map host port 80 to container port 80
+      - "8080:8080" # Expose Traefik dashboard port
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./traefik.yml:/etc/traefik/traefik.yml
-      - ./acme.json:/acme.json
+      - ./acme.json:/acme.json # Keep this for consistent config, but it won't be used locally
     command:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
       - --entrypoints.web.address=:80
-      - --api.insecure=true
-      - --log.level=DEBUG
+      - --api.insecure=true # Enable insecure API for local dashboard access
 
   db:
     image: postgres:15
