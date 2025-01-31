@@ -3,10 +3,14 @@ version: "3.9"
 services:
   web:
     build: .
+    entrypoint: /code/web_init.sh
+    
     volumes:
       - static_volume:/code/workshop_registration/staticfiles # Mount the static files where Django collects them
       - .:/code
       - media_volume:/code/media
+      - ./web_init/web_init.sh:/code/web_init.sh
+      
     expose:
       - "8000"
     depends_on:
@@ -25,7 +29,7 @@ services:
       - TIME_ZONE=Asia/Kolkata
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.web.rule=Host('140.238.243.169')"
+      - "traefik.http.routers.web.rule=Host(`140.238.243.169`)"
       - "traefik.http.routers.web.entrypoints=web"
       - "traefik.http.services.web.loadbalancer.server.port=8000"
 

@@ -18,6 +18,8 @@ RUN python ./workshop_registration/manage.py collectstatic --noinput
 
 
 WORKDIR /code/workshop_registration/
+# the workdir is changed so that the entrypoint script web_init.sh is able to access the manage.py
+# correctly
 
 # Set the entrypoint to Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--threads", "2", "workshop_registration.wsgi:application"]
+# CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--threads", "2", "workshop_registration.wsgi:application"]
