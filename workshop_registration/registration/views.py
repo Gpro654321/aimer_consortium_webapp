@@ -250,7 +250,8 @@ def calculate_amount(registration_type, existing_aimer_registration):
         amount = float(workshop_pricing.early_bird_price)
 
     if registration_type.name != 'AIMER' and existing_aimer_registration:
-        amount = amount * 0.8  # Apply discount after cut off logic
+        #amount = amount * 0.8  # Apply discount after cut off logic
+        amount = float(workshop_pricing.aimer_member_price)
 
     return amount
 
