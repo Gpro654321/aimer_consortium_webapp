@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.core.exceptions import ValidationError
 from .forms import RegistrationForm
 from .models import Participant, RegistrationType, WorkshopPricing, ParticipantRegistration, AimerMember
 import razorpay
@@ -168,56 +169,67 @@ def registration_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            registration_type = form.cleaned_data['registration_type']
-            participant_email = form.cleaned_data['email']
-            participant_name = form.cleaned_data['name']
-            participant_mobile_number = form.cleaned_data['mobile_number']
+            try:
+                registration_type = form.cleaned_data['registration_type']
+                participant_email = form.cleaned_data['email']
+                participant_name = form.cleaned_data['name']
+                participant_mobile_number = form.cleaned_data['mobile_number']
+                participant_designation = form.cleaned_data['designation']
+                participant_department = form.cleaned_data['department']
+                participant_institute = form.cleaned_data['institute']
 
 
-            # Get or create participant
-            participant, created = Participant.objects.get_or_create(
-                email=participant_email,
-                defaults={
-                    'name': participant_name, 
-                    'mobile_number': participant_mobile_number
-                    }
-            )
+                # Get or create participant
+                participant, created = Participant.objects.get_or_create(
+                    email=participant_email,
+                    defaults={
+                        'name': participant_name, 
+                        'mobile_number': participant_mobile_number,
+                        'designation': participant_designation,
+                        'department': participant_department,
+                        'institute': participant_institute
+                        }
+                )
 
-            is_aimer_registration = registration_type.name == 'AIMER'
+                is_aimer_registration = registration_type.name == 'AIMER'
 
-            print("is_aimer_registration",is_aimer_registration)
+                print("is_aimer_registration",is_aimer_registration)
 
-            # Check if existing Aimer member (for discount)
-            existing_aimer_member = None
-            if not is_aimer_registration:
-                try:
-                    existing_aimer_member = AimerMember.objects.get(participant=participant, is_active_member=True)
-                except AimerMember.DoesNotExist:
-                    pass
+                # Check if existing Aimer member (for discount)
+                existing_aimer_member = None
+                if not is_aimer_registration:
+                    try:
+                        existing_aimer_member = AimerMember.objects.get(participant=participant, is_active_member=True)
+                    except AimerMember.DoesNotExist:
+                        pass
 
-            amount = calculate_amount(registration_type, bool(existing_aimer_member))
+                amount = calculate_amount(registration_type, bool(existing_aimer_member))
 
-            order = create_razorpay_order(participant, amount)
+                order = create_razorpay_order(participant, amount)
 
-            # Create ParticipantRegistration without the payment
-            participant_registration = ParticipantRegistration.objects.create(
-                participant=participant,
-                registration_type=registration_type,
-                razorpay_order_id=order['id'],
-                #amount_paid=amount
-            )
+                # Create ParticipantRegistration without the payment
+                participant_registration = ParticipantRegistration.objects.create(
+                    participant=participant,
+                    registration_type=registration_type,
+                    razorpay_order_id=order['id'],
+                    #amount_paid=amount
+                )
 
-            # Create AimerMember if registering for AIMER
+                # Create AimerMember if registering for AIMER
 
-            #if is_aimer_registration:
-            #   AimerMember.objects.get_or_create(participant=participant)
+                #if is_aimer_registration:
+                #   AimerMember.objects.get_or_create(participant=participant)
 
-            context = {
-                'order': order,
-                'participant': participant,
-                'key_id': settings.RAZORPAY_KEY_ID
-            }
-            return render(request, './payment_automatic_redirect2.html', context)
+                context = {
+                    'order': order,
+                    'participant': participant,
+                    'key_id': settings.RAZORPAY_KEY_ID
+                }
+                return render(request, './payment_automatic_redirect2.html', context)
+            except ValidationError as e:
+                form.add_error(None, str(e))  # Add the error to the form's non-field errors
+                return render(request, './registration.html', {'form': form})
+
         else:
             return render(request, './registration.html', {'form': form})
     else:

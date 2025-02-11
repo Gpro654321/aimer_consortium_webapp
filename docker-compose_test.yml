@@ -9,7 +9,7 @@ services:
       - static_volume:/code/workshop_registration/staticfiles # Mount the static files where Django collects them
       - .:/code
       - media_volume:/code/media
-      - ./web_init/web_init.sh:/code/web_init.sh
+      - ./web_init/web_init_test.sh:/code/web_init.sh
       
       
     expose:

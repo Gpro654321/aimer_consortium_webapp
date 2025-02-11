@@ -16,6 +16,16 @@
                 </div>
             {% endfor %}
         </div>
+        
+        {% if form.non_field_errors %} 
+            <div class="error-message">
+                {% for error in form.non_field_errors %}
+                    {{ error }}<br>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+
         <button type="submit" class="submit-button">Submit</button>
     </form>
 </div>
