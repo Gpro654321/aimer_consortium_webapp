@@ -12,6 +12,8 @@ from .models import RegistrationType, WorkshopPricing, \
                     Participant, ParticipantRegistration, \
                     AimerMember
 
+from .location_models import District, State
+
 #from .workshop_pricing_admin_forms import WorkshopPricingForm  # Import the form
 
 #class WorkshopPricingAdmin(admin.ModelAdmin):
@@ -28,6 +30,9 @@ admin.site.register(RegistrationType)
 admin.site.register(WorkshopPricing)
 admin.site.register(ParticipantRegistration)
 admin.site.register(AimerMember)
+
+admin.site.register(District)
+admin.site.register(State)
 
 
 

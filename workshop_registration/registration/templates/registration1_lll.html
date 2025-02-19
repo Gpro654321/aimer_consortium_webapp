@@ -6,15 +6,6 @@
     <h1>Registration</h1>
     <form method="post" class="registration-form">  
         {% csrf_token %}
-        
-        <!-- Workshop Details Section (Placed Below State Dropdown) -->
-        <div class="workshop-details">
-            <h2>Workshop Details</h2>
-            <div id="workshop-details-container">
-                <p>Select a registration type to view workshop details</p>
-            </div>
-        </div>
-
         <div class="form-fields">
             {% for field in form %}
                 {% if field.name != "district" and field.name != "state" %}  <!-- Exclude State & District -->
@@ -30,8 +21,6 @@
                 {% endif %}
             {% endfor %}
 
-            
-
             <!-- Searchable State Dropdown -->
             <div class="form-group">
                 <label for="id_state">State</label>
@@ -42,8 +31,6 @@
                     {% endfor %}
                 </select>
             </div>
-
-            
 
             <!-- Searchable District Dropdown -->
             <div class="form-group">
@@ -69,9 +56,11 @@
     <div class="policy-container">
         <h2><a href="https://policies.aimerconsortium.in/terms-of-service" target="_blank">Terms of Service</a></h2>
         
+    
         <h2><a href="https://policies.aimerconsortium.in/privacy-policy" target="_blank">Privacy Policy</a></h2>
         
         <h2><a href="https://policies.aimerconsortium.in/refund-policy" target="_blank">Refund Policy</a></h2>
+    
     </div>
 </div>
 
@@ -124,44 +113,6 @@
                 });
             }
         });
-
-        // When the registration type is selected, fetch the workshop details dynamically
-        $('#id_registration_type').on('change', function() {
-            var selectedTypeId = $(this).val();
-            
-            // Fetch workshop details via AJAX request to Django view
-            $.ajax({
-                url: "/register/api/workshop-details/",  // Define this endpoint in your views.py
-                type: "GET",
-                data: { registration_type_id: selectedTypeId },
-                dataType: "json",
-                headers: { "X-CSRFToken": getCsrfToken() },
-                success: function(data) {
-                    var detailsContainer = $("#workshop-details-container");
-                    if (data.error) {
-                        detailsContainer.html("<p>No details available for this registration type.</p>");
-                    } else {
-                        detailsContainer.html(
-                            "<p><strong>Start Date:</strong> " + data.start_date + "</p>" +
-                            "<p><strong>End Date:</strong> " + data.end_date + "</p>" +
-                            "<p><strong>Early Bird Price:</strong> ₹" + data.early_bird_price + "</p>" +
-                            "<p><strong>Regular Price:</strong> ₹" + data.regular_price + "</p>" +
-                            "<p><strong>AIMER Member Price:</strong> ₹" + data.aimer_member_price + "</p>" +
-                            "<p><strong>Cut-off Date:</strong> " + data.cut_off_date + "</p>" +
-                            "<p><strong>Open for All:</strong> " + (data.is_open_for_all ? "Yes" : "No") + "</p>" +
-                            (data.brochure_link ? 
-                                "<p><strong>Brochure:</strong> <a href='" + data.brochure_link + 
-                                "' target='_blank' rel='noopener noreferrer'>Click here to view</a></p>" 
-                                : "")
-                        
-                        );
-                    }
-                },
-                error: function() {
-                    console.log("Error fetching workshop details");
-                }
-            });
-        });
     });
 </script>
 
@@ -174,9 +125,6 @@
         background: #f9f9f9;
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
     }
 
     .policy-container {
@@ -184,7 +132,6 @@
         text-align: left;
         padding-top: 15px;
         border-top: 1px solid #ddd;
-        width: 100%;
     }
 
     h2 {
@@ -223,32 +170,10 @@
         background-color: #0056b3;
     }
 
-    .workshop-details {
-        margin-top: 30px;
-        padding-top: 15px;
-        text-align: left;
-        border-top: 1px solid #ddd;
-        width: 100%;
-    }
-
-    .workshop-details p {
-        font-size: 1em;
-        line-height: 1.5;
-    }
-
-    @media (max-width: 768px) {
+    @media (max-width: 600px) {
         .registration-container {
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .workshop-details {
-            padding-left: 0;
-            width: 100%;
-        }
-
-        .workshop-details p {
-            font-size: 0.9em;
+            width: 90%;
+            padding: 15px;
         }
     }
 </style>

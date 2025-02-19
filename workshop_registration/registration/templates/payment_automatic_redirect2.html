@@ -48,12 +48,12 @@
             "name": "AIMER Consortium",
             "description": "Payment for Workshop Registration",
             "prefill": {
-                "name": "{{ prefill.name }}",
-                "email": "{{ prefill.email }}",
-                "contact": "{{ prefill.mobile_number }}"
+                "name": "{{ participant.name }}",
+                "email": "{{ participant.email }}",
+                "contact": "+91{{participant.mobile_number}}"
             },
             "notes": {
-                "participant_id": "{{ participant.id }}"
+                "id": "{{ participant.id }} - {{ participant.name }} - {{participant.mobile_number}}"
             },
             "theme": {
                 "color": "#F37254"
@@ -92,12 +92,31 @@
             },
             "modal": {
                 "ondismiss": function() {
-                    document.getElementById('redirect-message').style.display = 'none';
-                    document.getElementById('error-message').innerText = "Payment cancelled.";
-                    document.getElementById('error-message').style.display = 'block';
+                    //document.getElementById('redirect-message').style.display = 'none';
+                    //document.getElementById('error-message').innerText = "Payment cancelled.";
+                    //document.getElementById('error-message').style.display = 'block';
+                    
+                    console.log("Payment modal closed by user.");
+        
+                    // Show the error message explicitly
+                    var errorMessage = document.getElementById('error-message');
+                    errorMessage.innerText = "Payment cancelled.";
+                    errorMessage.style.display = 'block';  // Make sure it's visible
+
+                    // Ensure the redirect message is not hidden completely
+                    var redirectMessage = document.getElementById('redirect-message');
+                    redirectMessage.style.display = 'flex';
+
+                    // Optionally, redirect user back to registration page after 3 seconds
+                    setTimeout(function() {
+                        window.location.href = "{% url 'registration' %}";
+                    }, 300);
+
+                //
                 }
             }
         };
+        console.log("Razorpay Options:", options); // Log the options object
         var rzp1 = new Razorpay(options);
         window.onload = function() {
             rzp1.open();

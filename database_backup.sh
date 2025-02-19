@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Set working directory to script location
+cd "$(dirname "$0")"
+
+
 # Load environment variables from .env file
 set -a
 source ./.env
@@ -24,3 +28,9 @@ docker-compose cp db:/var/lib/postgresql/data/db_backup.sql "$BACKUP_FILE"
 find "$BACKUP_DIR" -type f -name "*.sql" -mtime +7 -exec rm {} \;
 
 echo "✅ Backup completed: $BACKUP_FILE"
+
+#use rclone to copy the backup folder to google drive
+rclone copy ./databackup aimer-backup:
+
+
+# test

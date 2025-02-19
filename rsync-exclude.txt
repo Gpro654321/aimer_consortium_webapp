@@ -1,0 +1,6 @@
+__pycache__/
+.git/
+node_modules/
+venv/
+acme.json
+workshop_registration/registration/migrations/*

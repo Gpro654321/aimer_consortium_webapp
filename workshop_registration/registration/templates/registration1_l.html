@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}  
+
+{% block content %}
+<div class="registration-container">  
+    <h1>Registration</h1>
+    <form method="post" class="registration-form">  
+        {% csrf_token %}
+        <div class="form-fields">
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error-message">
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        
+        {% if form.non_field_errors %} 
+            <div class="error-message">
+                {% for error in form.non_field_errors %}
+                    {{ error }}<br>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <button type="submit" class="submit-button">Submit</button>
+    </form>
+
+    <!-- Policy Section -->
+    <div class="policy-container">
+        <h2>Terms & Conditions</h2>
+        <p>You agree to share information entered on this page with Parthasarathi Ramanathan (owner of this page) and Razorpay, adhering to applicable laws.</p>
+        
+        <h2>Services & Pricing</h2>
+        <p>We conduct AI workshops designed to enhance medical education and research by utilizing AI tools for improved teaching and analysis. Pricing details are available in brochures shared via our social media platforms.</p>
+
+        <h2>Refund & Cancellation Policy</h2>
+        <p>Any refund or cancellation requests will be processed within 10 working days.</p>
+
+        <h2>Shipping Policy</h2>
+        <p>Not applicable.</p>
+
+        <h2>Contact Us</h2>
+        <p>Email: <a href="mailto:dr.geniaigpt@gmail.com">dr.geniaigpt@gmail.com</a><br>
+           Phone: 9940758249</p>
+    </div>
+</div>
+
+<style>
+    .registration-container {
+        max-width: 500px;
+        margin: 20px auto;
+        padding: 20px;
+        text-align: center;
+        background: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .policy-container {
+        margin-top: 30px;
+        text-align: left;
+        padding-top: 15px;
+        border-top: 1px solid #ddd;
+    }
+
+    h2 {
+        font-size: 1.2em;
+        margin-top: 15px;
+    }
+
+    p {
+        font-size: 0.95em;
+        line-height: 1.5;
+    }
+
+    .submit-button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+    }
+
+    .submit-button:hover {
+        background-color: #0056b3;
+    }
+
+    @media (max-width: 600px) {
+        .registration-container {
+            width: 90%;
+            padding: 15px;
+        }
+    }
+</style>
+
+{% endblock %}

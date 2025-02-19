@@ -1,0 +1,1 @@
+workshop_registration/registration/migrations/__init__.py

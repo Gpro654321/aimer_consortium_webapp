@@ -20,12 +20,13 @@ services:
     env_file:
       - .env  # Explicitly load the .env file
     environment:
+      - DJANGO_ENV=docker
       - POSTGRES_NAME=${POSTGRES_NAME}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - SECRET_KEY=${SECRET_KEY}  # Use the environment variable
       - DEBUG=1  # Turn off debug for production
-      - ALLOWED_HOSTS=140.238.243.169,localhost,aimerconsortium.labmasters.in  # Replace with your instance domain or IP
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}  # Replace with your instance domain or IP
       - USE_TZ=True
       - TIME_ZONE=Asia/Kolkata
     labels:

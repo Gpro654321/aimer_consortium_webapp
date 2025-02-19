@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .header { font-size: 20px; font-weight: bold; color: #2C3E50; }
+        .content { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <p class="header">Workshop Registration Confirmation</p>
+    <p class="content">Dear {{ name }},</p>
+    
+    <p class="content">
+        Thank you for registering for our workshop <strong>{{ workshop }}</strong>.
+        Below is your WhatsApp group link to join the discussion:
+    </p>
+    
+    <p class="content">
+        <a href="{{ whatsapp_link }}" target="_blank">Join WhatsApp Group</a>
+    </p>
+
+    <p class="content">
+        Your receipt is attached to this email.
+    </p>
+
+    <p class="content">Best Regards,</p>
+    <p class="content"><strong>AIMER Consortium</strong></p>
+</body>
+</html>

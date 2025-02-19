@@ -18,6 +18,8 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# load environment vairables
+load_dotenv(BASE_DIR / '.env') # Load .env file
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -29,8 +31,10 @@ print(SECRET_KEY)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split()
 
+print("Inside settings/allowed_hosts")
+print(ALLOWED_HOSTS)
 
 # Application definition
 
@@ -155,14 +159,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # https
+'''
 CSRF_TRUSTED_ORIGINS = [
     "https://aimerconsortium.labmasters.in"
 ]
+'''
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "").split()
+print("Inside settings/csrf_trusted_origins")
+print(CSRF_TRUSTED_ORIGINS)
+
 
 
 # razor pay
-
-load_dotenv(BASE_DIR / '.env') # Load .env file
 
 RAZORPAY_KEY_ID = os.environ.get('key_id')
 RAZORPAY_KEY_SECRET = os.environ.get('key_secret')
