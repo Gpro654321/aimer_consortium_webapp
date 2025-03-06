@@ -7,8 +7,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 print("Inside settings/base")
 print(BASE_DIR)
 
+DJANGO_ENV = os.getenv("DJANGO_ENV", "local")
+
+print(DJANGO_ENV)
 # Load environment variables
-load_dotenv(BASE_DIR / ".env")
+
+if DJANGO_ENV == "docker":
+    print("inside /base.py/DJANGO_ENV==docker")
+    load_dotenv(BASE_DIR / ".env", override=True)
+else:
+    print("inside /base.py/else")
+    load_dotenv(BASE_DIR / ".env_local", override=True)
+
+#preliminary check
+print(os.environ.get("key_id"))
+print(os.environ.get("key_secret"))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY", "your-default-secret-key")
@@ -32,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "dashboard",
     "registration",
 ]
 
@@ -72,6 +86,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+LOGIN_URL = '/admin/login/'  # Redirects unauthenticated users to Django admin login
+
+
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Asia/Kolkata"
 USE_I18N = True
@@ -103,3 +120,5 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 
+EMAIL_IMAP_HOST = "imap.hostinger.com"
+EMAIL_IMAP_PORT = 993

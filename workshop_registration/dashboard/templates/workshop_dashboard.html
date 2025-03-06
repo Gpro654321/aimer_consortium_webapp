@@ -1,0 +1,244 @@
+{% extends "base_dashboard.html" %}
+{% block content %}
+{% load custom_filters %}
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Page Title */
+        .page-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Top Buttons */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .top-bar a, .top-bar button {
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+
+        .admin-dashboard {
+            background-color: #343a40;
+            color: white;
+        }
+
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* Summary Section */
+        .summary-section {
+            padding: 15px 20px;
+            background-color: white;
+            border-bottom: 2px solid #ddd;
+            text-align: center;
+        }
+
+        .summary-section h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .total-participants {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        /* Full-Width Chart */
+        .chart-container {
+            width: 100%;
+            height: 300px; /* Optimal height */
+            padding: 20px;
+        }
+
+        /* Search & Download Section */
+        .search-download {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: white;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .search-download input {
+            padding: 8px;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .btn-primary {
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Table Styling */
+        .table-container {
+            margin-top: 10px;
+            padding: 0 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .pagination a {
+            padding: 8px 12px;
+            margin: 0 5px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: white;
+            background-color: #007bff;
+        }
+    </style>
+</head>
+
+<!-- Page Title -->
+<div class="page-title">Workshop Dashboard</div>
+
+<!-- Top Bar with Dashboard & Logout -->
+<div class="top-bar">
+    <a href="{% url 'admin_dashboard' %}" class="admin-dashboard">Admin Dashboard</a>
+    <form method="POST" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="logout-btn">Logout</button>
+    </form>
+</div>
+
+<!-- Summary Section -->
+<div class="summary-section">
+    <h2>Workshop: {{ workshop.workshop_name.name }}</h2>
+    <div class="total-participants">Total Participants: {{ total_participants }}</div>
+</div>
+
+<!-- Full-Width Chart -->
+<div class="chart-container">
+    <canvas id="stateChart"></canvas>
+</div>
+
+<!-- Search & Download Section -->
+<div class="search-download">
+    <form method="GET">
+        <input type="text" name="search" placeholder="Search participant...">
+        <button type="submit">Search</button>
+    </form>
+    <a href="{% url 'export_workshop_csv' workshop.id %}" class="btn-primary">Download CSV</a>
+</div>
+
+<!-- Table -->
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Mobile Number</th>
+                <th>Email</th>
+                <th>Designation</th>
+                <th>Department</th>
+                <th>Institute</th>
+                <th>Registration Type</th>
+                <th>Other Workshops</th>
+                <th>Payment Id</th>
+                <th>Payment Status</th>
+                <th>Amount Paid</th>
+                <th>Registered At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for registration in registrations %}
+            <tr>
+                <td>{{ registration.participant.name }}</td>
+                <td>{{ registration.participant.mobile_number }}</td>
+                <td>{{ registration.participant.email }}</td>
+                <td>{{ registration.participant.designation }}</td>
+                <td>{{ registration.participant.department }}</td>
+                <td>{{ registration.participant.institute }}</td>
+                <td>{{ registration.registration_type.name }}</td>
+                <td>{{ participant_other_workshops|get_item:registration.participant.id|default:"-" }}</td>
+                <td>{{ registration.razorpay_payment_id }}</td>
+                <td>{% if registration.payment_status %}✅ Paid{% else %}❌ Not Paid{% endif %}</td>
+                <td>₹{{ registration.amount_paid }}</td>
+                <td>{{ registration.registered_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+<div class="pagination">
+    {% if registrations.has_previous %}
+        <a href="?page=1">First</a>
+        <a href="?page={{ registrations.previous_page_number }}">Previous</a>
+    {% endif %}
+
+    <span>Page {{ registrations.number }} of {{ registrations.paginator.num_pages }}</span>
+
+    {% if registrations.has_next %}
+        <a href="?page={{ registrations.next_page_number }}">Next</a>
+        <a href="?page={{ registrations.paginator.num_pages }}">Last</a>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    fetch("{% url 'workshop_statewise_chart' workshop.id %}")
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById("stateChart").getContext("2d");
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: data.statewise_counts.map(item => item.state),
+                    datasets: [{
+                        label: "Number of Participants",
+                        data: data.statewise_counts.map(item => item.count),
+                        backgroundColor: "rgba(75, 192, 192, 0.7)",
+                    }]
+                }
+            });
+        });
+});
+</script>
+
+{% endblock %}

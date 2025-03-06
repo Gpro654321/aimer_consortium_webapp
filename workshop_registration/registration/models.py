@@ -64,7 +64,10 @@ class RegistrationType(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name
+        if self.name == "AIMER":
+            return self.name + " Consortium Annual Membership"
+        else:
+            return self.name
 
 class WorkshopPricing(models.Model):
     workshop_name = models.ForeignKey(RegistrationType, on_delete=models.CASCADE,related_name='workshop_pricings')

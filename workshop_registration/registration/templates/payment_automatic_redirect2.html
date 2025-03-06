@@ -46,14 +46,14 @@
             "currency": "{{ order.currency }}",
             "order_id": "{{ order.id }}",
             "name": "AIMER Consortium",
-            "description": "Payment for Workshop Registration",
+            "description": "{{ registration_type_name }}",
             "prefill": {
                 "name": "{{ participant.name }}",
                 "email": "{{ participant.email }}",
                 "contact": "+91{{participant.mobile_number}}"
             },
             "notes": {
-                "id": "{{ participant.id }} - {{ participant.name }} - {{participant.mobile_number}}"
+                "id": "{{ participant.id }} - {{ participant.name }} - {{participant.mobile_number}} - {{ registration_type_name }}"
             },
             "theme": {
                 "color": "#F37254"

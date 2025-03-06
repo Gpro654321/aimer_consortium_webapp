@@ -4,3 +4,5 @@ node_modules/
 venv/
 acme.json
 workshop_registration/registration/migrations/*
+workshop_registration/dashboard/migrations/*
+aimer/*

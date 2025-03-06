@@ -3,12 +3,20 @@ FROM python:3.10-slim-buster
 WORKDIR /code
 
 # Install system dependencies for psycopg2
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        postgresql-client \
-        && rm -rf /var/lib/apt/lists/*
 
+
+RUN apt-get update && \
+    apt-get install -y supervisor \
+    fonts-dejavu-core fonts-liberation \
+    postgresql-client --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
+    
+
+COPY supervisord.conf /etc/supervisor/conf.d/supervisor.conf
 COPY requirements.txt /code/
+
+RUN mkdir -p /var/log/celery
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /code/

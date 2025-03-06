@@ -433,7 +433,8 @@ def registration_view(request):
             context = {
                 'order': order,
                 'participant': participant,
-                'key_id': settings.RAZORPAY_KEY_ID
+                'key_id': settings.RAZORPAY_KEY_ID,
+                'registration_type_name': registration_type.name
             }
             return render(request, './payment_automatic_redirect2.html', context)
 

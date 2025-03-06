@@ -18,6 +18,7 @@ class Command(BaseCommand):
         try:
             # Get or create the workshop
             workshop, _ = RegistrationType.objects.get_or_create(name=workshop_name)
+            print("workshop is ",workshop)
 
             with open(csv_file_path, newline='', encoding='utf-8') as csvfile:
                 reader = csv.DictReader(csvfile)
@@ -26,6 +27,7 @@ class Command(BaseCommand):
                     email = row["Email Address"].strip().lower()
                     timestamp = row.get("Timestamp", "").strip()
                     payment_id = row.get("Razorpay transaction number", "").strip()
+                    amount_paid = row.get("amount_paid").strip()
 
                     if not email:
                         self.stderr.write(self.style.ERROR("Skipping row: Missing email"))
@@ -33,11 +35,21 @@ class Command(BaseCommand):
 
                     try:
                         # Convert Timestamp to Date
-                        try:
-                            registered_at = datetime.strptime(timestamp, "%m/%d/%Y %H:%M:%S")  # Adjust format if needed
-                        except ValueError:
+                        from datetime import datetime
+
+                        formats = ["%Y/%m/%d %H:%M:%S", "%d/%m/%Y %H:%M:%S", "%m/%d/%Y %H:%M:%S"]
+
+                        for fmt in formats:
+                            try:
+                                registered_at = datetime.strptime(timestamp, fmt)
+                                break  # Exit the loop if parsing is successful
+                            except ValueError:
+                                continue  # Try the next format if this one fails
+                        else:
+                            # This runs only if all formats fail
                             self.stderr.write(self.style.ERROR(f"Skipping row: Invalid timestamp format '{timestamp}'"))
-                            continue
+                            continue  # Skip to the next row
+
 
                         # Create or update participant
                         participant, created = Participant.objects.get_or_create(
@@ -51,10 +63,11 @@ class Command(BaseCommand):
                             }
                         )
 
-                        # Create AIMER membership if it doesn't exist
-                        aimer_member, created = AimerMember.objects.get_or_create(participant=participant)
-                        if created:
-                            self.stdout.write(self.style.SUCCESS(f"Marked {participant.name} as an AIMER Member"))
+                        if workshop.name == "AIMER":
+                            # Create AIMER membership if it doesn't exist
+                            aimer_member, created = AimerMember.objects.get_or_create(participant=participant)
+                            if created:
+                                self.stdout.write(self.style.SUCCESS(f"Marked {participant.name} as an AIMER Member"))
 
 
                         if created:
@@ -70,7 +83,7 @@ class Command(BaseCommand):
                                 "razorpay_order_id": "order_mancrete",
                                 "razorpay_payment_id": payment_id if payment_id else None,
                                 "payment_status": True,
-                                "amount_paid": 2000.00,  # Decimal field
+                                "amount_paid": amount_paid,  # Decimal field
                                 "registered_at": registered_at,
                             }
                         )

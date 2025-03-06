@@ -1,0 +1,167 @@
+{% extends "base_dashboard.html" %}
+
+{% block content %}
+<style>
+    /* Basic styling for a professional look */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+    }
+
+    /* Search bar styling */
+    form {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+        padding: 8px;
+        width: 300px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    button {
+        padding: 8px 12px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    /* Table styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #f4f4f4;
+        font-weight: bold;
+    }
+
+    /* Pagination */
+    .pagination {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .pagination a {
+        padding: 8px 12px;
+        margin: 0 5px;
+        text-decoration: none;
+        color: #007bff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .pagination a:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
+    /* Fixed Logout Button */
+    .logout-btn {
+        position: fixed;
+        top: 15px;
+        right: 20px;
+        background-color: #dc3545;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .logout-btn:hover {
+        background-color: #a71d2a;
+    }
+
+    /* Fixed Admin Dashboard Link */
+    .fixed-footer {
+        position: fixed;
+        bottom: 10px;
+        left: 20px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+</style>
+
+<!-- Logout Button (Top Right) -->
+<form method="POST" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit" class="logout-btn">Logout</button>
+</form>
+
+<h2>Admin Dashboard</h2>
+
+<!-- Search Bar -->
+<form method="GET" action="">
+    <input type="text" name="search" placeholder="Search workshop..." value="{{ search_query }}">
+    <button type="submit">Search</button>
+</form>
+
+<!-- Workshops Table -->
+<table>
+    <thead>
+        <tr>
+            <th>Workshop Name</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Total Participants</th>
+            <th>Status</th>
+            <th>View</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for workshop in workshops %}
+        <tr>
+            <td>{{ workshop.workshop_name.name }}</td>
+            <td>{{ workshop.workshop_start_date }}</td>
+            <td>{{ workshop.workshop_end_date }}</td>
+            <td>{{ workshop.participant_count }}</td>
+            <td>{% if workshop.is_alive %}✅ Live{% else %}❌ Closed{% endif %}</td>
+            <td><a href="{% url 'workshop_dashboard' workshop.id %}">View Dashboard</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Pagination -->
+<div class="pagination">
+    {% if workshops.has_previous %}
+        <a href="?page=1">First</a>
+        <a href="?page={{ workshops.previous_page_number }}">Previous</a>
+    {% endif %}
+
+    Page {{ workshops.number }} of {{ workshops.paginator.num_pages }}
+
+    {% if workshops.has_next %}
+        <a href="?page={{ workshops.next_page_number }}">Next</a>
+        <a href="?page={{ workshops.paginator.num_pages }}">Last</a>
+    {% endif %}
+</div>
+
+<!-- Fixed Admin Dashboard Link -->
+<div class="fixed-footer">
+    <a href="{% url 'admin_dashboard' %}">Admin Dashboard</a>
+</div>
+
+{% endblock %}

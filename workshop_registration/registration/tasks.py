@@ -1,4 +1,8 @@
 import os
+import logging
+
+
+
 from celery import shared_task
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -12,22 +16,30 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from .models import ParticipantRegistration
 
+
+
+logger = logging.getLogger(__name__)
+
 @shared_task
 def send_registration_email(participant_registration_id):
     """Send confirmation email asynchronously using Celery."""
+
+    
 
     try:
         # Fetch participant registration instance
         participant_registration = ParticipantRegistration.objects.get(id=participant_registration_id)
         participant = participant_registration.participant
         workshop_name = participant_registration.registration_type.name
+        #print("Inside /registration/tasks.py/send_registration_email/try")
+        #print("workshop_name, ", workshop_name)
 
         # Fetch WhatsApp group link
         whatsapp_link = participant_registration.registration_type.workshop_pricings.first().whatsapp_group_link
-
+        #print("whatsapp_link, ", whatsapp_link)
         # Generate PDF Receipt
         pdf_buffer = generate_receipt(participant_registration)
-
+        #print("pdf_buffer, ", pdf_buffer)
         # Prepare email message
         subject = f"Workshop Registration Confirmation - {workshop_name}"
         message = render_to_string('confirmation_email.html', {
@@ -36,12 +48,16 @@ def send_registration_email(participant_registration_id):
             'whatsapp_link': whatsapp_link
         })
 
+        logger.info(f"Sending email to {participant.email}...")
+
+
         # Create email with PDF attachment
         email = EmailMessage(
             subject,
             message,
             settings.EMAIL_HOST_USER,
-            [participant.email]
+            [participant.email],
+            #bcc=[settings.EMAIL_HOST_USER]
         )
         email.attach(
             f"Receipt_{participant.name}_{workshop_name}.pdf",
@@ -50,6 +66,11 @@ def send_registration_email(participant_registration_id):
         )
         email.content_subtype = "html"  # Ensure HTML format
         email.send()
+
+        
+
+        
+        logger.info(f"Email sent successfully to {participant.email}")
 
     except Exception as e:
         print(f"Email sending failed: {e}")
@@ -82,7 +103,7 @@ def generate_receipt(participant_registration):
     # ✅ Add Website Below Title
     p.setFont("Helvetica-Oblique", 12)
     p.setFillColor(colors.black)
-    p.drawCentredString(width / 2, height - 80, "https://register.aimerconsortium.in")
+    p.drawCentredString(width / 2, height - 80, "https://www.aimerconsortium.in")
 
     # ✅ Draw horizontal separator line (after some spacing)
     p.setStrokeColor(colors.black)
@@ -93,10 +114,11 @@ def generate_receipt(participant_registration):
     p.setFillColor(colors.lightgrey)
     p.rect(40, height - 145, width - 80, 30, fill=True, stroke=False)
 
-    # ✅ Add "PAYMENT RECEIPT" Title (Centered)
+    # ✅ Add "PAYMENT RECEIPT" Title (Centered & Vertically Adjusted)
     p.setFillColor(colors.black)
     p.setFont("Helvetica-Bold", 16)
-    p.drawCentredString(width / 2, height - 130, "PAYMENT RECEIPT")
+    p.drawCentredString(width / 2, height - 132, "PAYMENT RECEIPT")  # Adjusted for centering
+
 
     # ✅ Reset font and text color for details
     p.setFillColor(colors.black)
@@ -135,4 +157,6 @@ def generate_receipt(participant_registration):
     buffer.seek(0)
 
     return buffer
+
+
 

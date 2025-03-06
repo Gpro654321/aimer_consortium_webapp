@@ -19,10 +19,11 @@ from django.urls import path, include
 
 from django.conf import settings
 
-from registration import views_admin
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('admin_dash/', include('dashboard.urls')),
     
     path('register/', include('registration.urls')),
     
