@@ -1,0 +1,12 @@
+{% extends 'base_registration.html' %}
+
+{% block title %}Certificate Verified{% endblock %}
+
+{% block content %}
+    <div class="alert alert-success text-center">
+        <h1>Certificate Verified!</h1>
+        <p><strong>Name:</strong> {{ name }}</p>
+        <p><strong>Email:</strong> {{ email }}</p>
+        <a href="{% url 'registration' %}" class="btn btn-primary mt-4">Back to Home</a>
+    </div>
+{% endblock %}

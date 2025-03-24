@@ -22,3 +22,5 @@ INTERNAL_IPS = ["127.0.0.1"]
 CELERY_BROKER_URL = "redis://localhost:6379/0"  # Redis as the broker
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'  # Optional if using django-celery-beat

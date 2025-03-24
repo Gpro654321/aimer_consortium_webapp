@@ -12,5 +12,8 @@ app = Celery("workshop_registration")
 # Load settings from Django settings
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
+# Set Celery to use Django's database-backed scheduler
+app.conf.beat_scheduler = 'django_celery_beat.schedulers.DatabaseScheduler'
+
 # Auto-discover tasks in installed Django apps
 app.autodiscover_tasks()

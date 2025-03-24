@@ -1,0 +1,11 @@
+{% extends 'base_registration.html' %}
+
+{% block title %}Invalid Certificate{% endblock %}
+
+{% block content %}
+    <div class="alert alert-danger text-center">
+        <h1>Invalid Certificate</h1>
+        <p>The certificate could not be verified.</p>
+        <a href="{% url 'registration' %}" class="btn btn-primary mt-4">Back to Home</a>
+    </div>
+{% endblock %}

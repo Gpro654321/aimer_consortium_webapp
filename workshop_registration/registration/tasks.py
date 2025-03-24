@@ -1,6 +1,12 @@
 import os
 import logging
 
+from celery import shared_task
+from django.core.management import call_command
+
+
+
+
 
 
 from celery import shared_task
@@ -160,3 +166,15 @@ def generate_receipt(participant_registration):
 
 
 
+@shared_task
+def reconcile_unpaid(date=None):
+    """Run the reconcile_unpaid management command."""
+    try:
+        if date:
+            logger.info(f"Running reconcile_unpaid with date: {date}")
+            call_command('reconcile_unpaid', date=date)
+        else:
+            logger.info("Running reconcile_unpaid without date")
+            call_command('reconcile_unpaid')
+    except Exception as e:
+        logger.error(f"Error running reconcile_unpaid: {e}")

@@ -1,0 +1,18 @@
+WHILE UPING A LATEST WEB CONTAINER AFTER UPDATES:
+
+    1. Always take a backup from the cloud instance using database_backup.sh script before downing
+        the web container.
+    2. Always stop the web container ONLY
+    3. Always pull the latest web container, build and then up
+
+
+WHILE SENDING CERTIFICATES:
+
+    1. Always takenote of the workshop_id from registration_types (NOT workshop_pricing)
+    2. Always makesure that the template is complete with Resource person's signatures
+    3. Cleanup the /tmp directory in container manually (until you comeup with a scripting solution)
+        before initiating certificate send task
+    4. DONOT use same template url for 2 different workshops.
+        Even if they are weekend and weekday batches upload them as seperate files in google drive and
+        have seperate links.
+    5. DONOT run 2 certificate sending tasks simultaneously

@@ -369,13 +369,17 @@ def _validate_aimer_registration(cleaned_data):
 
         if not has_paid_workshop:
             return "Only participants who have attended a paid workshop can register for AIMER."
+        
 
-        # Ensure they haven't already registered for AIMER
+        '''
+         # Ensure they haven't already registered for AIMER
         already_registered = ParticipantRegistration.objects.filter(
             participant=participant, registration_type=registration_type
         ).exists()
+        '''
+        already_registered=_get_existing_registration(participant, registration_type)
 
-        if already_registered:
+        if already_registered == "PAID":
             return "You have already registered for AIMER."
 
         return None  # No validation errors, registration is allowed.
@@ -422,6 +426,14 @@ def registration_view(request):
 
             # Create Razorpay order
             amount = calculate_amount(registration_type, bool(existing_aimer_member))
+
+            
+            if amount == 0:
+                #execute this block if the amount is zero. Sometimes AIMER members have this priviledge
+                form.add_error(None, "You can attend for FREE")
+                #return render(request, './registration.html', {'form': form})
+                return render(request, './registration.html', {'form': form, **_get_searchable_data()}) 
+
             order = create_razorpay_order(participant, amount)
 
             # Update and save registration details
@@ -442,6 +454,8 @@ def registration_view(request):
             form.add_error(None, str(e))
             #return render(request, './registration.html', {'form': form})
             return render(request, './registration.html', {'form': form, **_get_searchable_data()})
+        
+        
 
     else:
         form = RegistrationForm()

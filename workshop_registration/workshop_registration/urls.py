@@ -26,6 +26,7 @@ urlpatterns = [
     path('admin_dash/', include('dashboard.urls')),
     
     path('register/', include('registration.urls')),
+    path('certificate/', include('certificate.urls')),
     
 
 ]

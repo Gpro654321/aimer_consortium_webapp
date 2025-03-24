@@ -1,0 +1,8 @@
+To bring down the mental clutter before sending certificates to a workshop
+
+    1. I should be able to select participants and send certificates from certificate_status admin panel
+        itself (priority 3)
+    2. The font color for the participant's name should automatically be chosen such that it is visible
+        A automatic visiblity checker should be implemented. (priority 2)
+    3. Before sending certificates to a workshop group, there should be a sample certificate shown to me
+        with the list of participants who have attended this workshop. (priority 1)

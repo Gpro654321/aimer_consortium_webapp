@@ -12,7 +12,7 @@ class RegistrationForm(forms.Form):
         queryset=RegistrationType.objects.filter(
             workshop_pricings__is_alive=True,
             workshop_pricings__workshop_end_date__gte=today
-        ).distinct(),
+        ).distinct().order_by('workshop_pricings__workshop_start_date'),
         label="Select Workshop"
     )
 

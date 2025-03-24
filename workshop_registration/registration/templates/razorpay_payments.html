@@ -1,0 +1,73 @@
+{% extends 'base_registration.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <form method="get">
+            <div class="mb-2">
+                <label for="date" class="fw-bold me-2">Select Date:</label>
+            </div>
+            <div class="d-flex align-items-center">
+                <input type="date" id="date" name="date" value="{{ selected_date }}" class="form-control w-auto me-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+    
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-striped align-middle">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th scope="col">Payment ID</th>
+                        <th scope="col">Order ID</th>
+                        <th scope="col">Amount (₹)</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Contact</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td class="text-nowrap text-center">{{ payment.id }}</td>
+                        <td class="text-nowrap text-center">{{ payment.order_id }}</td>
+                        <td class="text-end">₹{% widthratio payment.amount 100 1 as divided_amount %}{{ divided_amount|floatformat:2 }}</td>
+
+                        <td class="text-capitalize text-center">
+                            <span class="badge bg-success">{{ payment.status }}</span>
+                        </td>
+                        <td class="text-nowrap text-center">{{ payment.contact }}</td>
+                        <td class="text-break">{{ payment.email }}</td>
+                        <td>{{ payment.description|default:"—" }}</td>
+                        <td>
+                            {% if payment.notes %}
+                                <ul class="list-unstyled mb-0">
+                                    {% for key, value in payment.notes.items %}
+                                        <li><strong>{{ key }}:</strong> {{ value }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">No successful payments found for the selected date.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+    
+
+{% endblock %}

@@ -156,3 +156,10 @@ class ParticipantRegistration(models.Model):  # New model for registration detai
             super().save(*args, **kwargs) 
         except IntegrityError:
             raise ValidationError("Participant is already registered for this workshop.")
+        
+
+
+
+class RazorpayPayment(models.Model):
+    class Meta:
+        verbose_name_plural = "Razorpay Payments"

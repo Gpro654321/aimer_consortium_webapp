@@ -45,8 +45,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_celery_beat",
     "dashboard",
     "registration",
+    "certificate",
+    "colorfield"
 ]
 
 MIDDLEWARE = [
@@ -117,8 +120,41 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.hostinger.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+#default - email address
 EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 
+
+# Separate accounts for receipts and certificates
+EMAIL_ACCOUNTS = {
+    'receipts': {
+        'USER': os.environ.get('EMAIL_HOST_USER_RECEIPTS', ''),
+        'PASSWORD': os.environ.get('EMAIL_HOST_PASSWORD_RECEIPTS', '')
+    },
+    'certificates': {
+        'USER': os.environ.get('EMAIL_HOST_USER_CERTIFICATES', ''),
+        'PASSWORD': os.environ.get('EMAIL_HOST_PASSWORD_CERTIFICATES', '')
+    }
+}
+
+
+
+
 EMAIL_IMAP_HOST = "imap.hostinger.com"
 EMAIL_IMAP_PORT = 993
+
+
+# for certificate signing
+
+# Add this line to specify the path to the keys folder
+KEYS_DIR = os.path.join(BASE_DIR, 'workshop_registration/certificate', 'keys')
+
+# Private Key Path
+PRIVATE_KEY_PATH = os.path.join(KEYS_DIR, 'private_key.pem')
+
+# Public Key Path (Optional, in case you need to verify the signature later)
+PUBLIC_KEY_PATH = os.path.join(KEYS_DIR, 'public_key.pem')
+
+print("Inside base settings, Private_key_path",PRIVATE_KEY_PATH)
+print("Inside base settings, public_key_path", PUBLIC_KEY_PATH)
